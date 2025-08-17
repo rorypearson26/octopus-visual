@@ -1,27 +1,23 @@
 services:
-  # backend:
-  #   build: ./backend
-  #   container_name: backend_app
-  #   restart: always
-  #   profiles:
-  #     - backend # This service is part of the 'backend' profile
-  #     - full    # And also part of the 'full' profile
-  #   env_file:
-  #     - .env.dev
-  #   ports:
-  #     - "3000:3000"
-  #   volumes:
-  #     - ./backend:/app # For development hot-reloading
-  #   depends_on:
-  #     - db # The backend depends on the database
+  backend:
+    build: ./backend
+    container_name: backend_app
+    restart: always
+    profiles:
+     - backend
+     - full
+    ports:
+     - "8000:8000"
+    environment:
+      PYTHONUNBUFFERED: 1
 
   frontend:
-    build: ./front-end/octopus/
+    build: ./frontend/octopus/
     container_name: frontend_app
     restart: always
     profiles:
-      - frontend # This service is part of the 'frontend' profile
-      - full # And also part of the 'full' profile
+      - frontend
+      - full
     ports:
       - "3000:3000"
     volumes:
