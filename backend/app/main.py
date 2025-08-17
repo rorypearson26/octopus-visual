@@ -1,14 +1,16 @@
 import asyncio
 from http import HTTPStatus
 
-from fastapi import APIRouter, FastAPI, BackgroundTasks
+from fastapi import APIRouter, FastAPI, BackgroundTasks, HTTPException
+from fastapi.openapi.models import Response
+from starlette.middleware.cors import CORSMiddleware
 
 from fake_awake import Awake
 
 awake = Awake()
 
 app = FastAPI()
-router = APIRouter()
+router = APIRouter(prefix="/api")
 
 tags_metadata = [
     {
@@ -21,30 +23,20 @@ tags_metadata = [
     },
 ]
 
-
-async def sleep_app_in_n_seconds(seconds_delay: int):
-    print(f"Staying fake awake for {seconds_delay} seconds...")
-    await asyncio.sleep(seconds_delay)
-    awake.is_awake = False
-    print(f"Fake shutting down.")
-
-
-async def wake_up(seconds_delay: int):
-    print(f"Waking up in {seconds_delay} seconds...")
-    await asyncio.sleep(seconds_delay)
-    awake.is_awake = True
-    print(f"I have risen")
-
-
-@router.get("/", tags=["setup"])
+@router.get("/wakeup/", tags=["setup"])
 async def wakeup(background_tasks: BackgroundTasks):
-    background_tasks.add_task(wake_up, 7)
-    if awake.is_awake:
-        return HTTPStatus.OK
-    else:
-        background_tasks.add_task(sleep_app_in_n_seconds, 30)
-        return HTTPStatus.NOT_FOUND
+    return HTTPStatus.OK
 
+origins = [
+    "http://localhost:3000",
+]
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(router)

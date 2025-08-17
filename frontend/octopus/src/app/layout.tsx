@@ -9,6 +9,7 @@ import {
 } from "@mantine/core";
 
 import { octopusTheme } from "./theme";
+import { QueryProvider } from "./QueryProvider";
 
 export const metadata = {
   title: "Octopus Visuals",
@@ -25,7 +26,9 @@ export default function RootLayout({
         <ColorSchemeScript />
       </head>
       <body>
-        <MantineProvider theme={octopusTheme}>{children}</MantineProvider>
+        <QueryProvider>
+          <MantineProvider theme={octopusTheme}>{children}</MantineProvider>
+        </QueryProvider>
       </body>
     </html>
   );
