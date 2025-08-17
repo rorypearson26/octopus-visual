@@ -19,6 +19,6 @@ docker run -p 8000:8000 octopus-backend:latest
 ### CLI
 Running from the `app` directory
 ```bash 
-uvicorn app/main:app --reload
+uvicorn main:app --reload
 ```
 _Note the `--reload` flag will reload the server if any changes are detected. As such, probably easiest to use this during development._

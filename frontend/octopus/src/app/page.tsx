@@ -13,12 +13,15 @@ import {
 } from "@mantine/core";
 import { hasLength, useForm } from "@mantine/form";
 
+import { useBackendAwake } from "./api/wakeup/route";
 import Header from "./common/header/Header";
 import StatusWithText from "./common/header/StatusWithText";
 
 const API_KEY_LENGTH = 10;
 
 export default function LandingPage() {
+  const isBackendAwake = useBackendAwake();
+
   const form = useForm({
     validateInputOnChange: true,
     mode: "uncontrolled",
@@ -30,15 +33,16 @@ export default function LandingPage() {
       ),
     },
   });
+
   const { isValid, isDirty } = form;
+
   const isContinueEnabled = useMemo(() => {
-    return isDirty() && isValid();
-  }, [isDirty, isValid]);
+    return isDirty() && isValid() && isBackendAwake;
+  }, [isDirty, isValid, isBackendAwake]);
 
   const onFormSubmit = () => {
     console.log("off to see the api");
   };
-  console.log(isContinueEnabled);
 
   return (
     <form onSubmit={form.onSubmit(onFormSubmit)}>
@@ -47,7 +51,7 @@ export default function LandingPage() {
         <Container size="sm" mt={20}>
           <Text m={2}>Submit API key to authenticate account</Text>
           <StatusWithText
-            isEnabled={true}
+            isEnabled={isBackendAwake}
             enabledText="Backend is alive"
             loadingText="Waiting for backend to wake up"
           />

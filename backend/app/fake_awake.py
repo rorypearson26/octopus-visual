@@ -8,6 +8,5 @@ class Awake(object):
 
     @is_awake.setter
     def is_awake(self, value):
-        print("setter of x called")
         self._is_awake = value
 
