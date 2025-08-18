@@ -1,13 +1,18 @@
 // Import styles of packages that you've installed.
 // All packages except `@mantine/hooks` require styles imports
-import '@mantine/core/styles.css';
-import '@mantine/notifications/styles.css';
+import "@mantine/core/styles.css";
+import "@mantine/notifications/styles.css";
 
-import { ColorSchemeScript, mantineHtmlProps, MantineProvider } from '@mantine/core';
-import { Notifications } from '@mantine/notifications';
+import {
+  ColorSchemeScript,
+  mantineHtmlProps,
+  MantineProvider,
+} from "@mantine/core";
+import { Notifications } from "@mantine/notifications";
 
-import { octopusTheme } from '../theme';
-import { QueryProvider } from './QueryProvider';
+import { octopusTheme } from "../theme";
+import Header from "./_common/header/Header";
+import { QueryProvider } from "./QueryProvider";
 
 export const metadata = {
   title: "Octopus Visuals",
@@ -27,6 +32,7 @@ export default function RootLayout({
         <QueryProvider>
           <MantineProvider theme={octopusTheme}>
             <Notifications position="top-center" />
+            <Header />
             {children}
           </MantineProvider>
         </QueryProvider>

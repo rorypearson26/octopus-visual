@@ -2,23 +2,32 @@ services:
   backend:
     build: ./backend
     container_name: backend_app
-    restart: always
     profiles:
-     - backend
      - full
+     - backend
     ports:
      - "8000:8000"
     environment:
       PYTHONUNBUFFERED: 1
 
-  frontend:
+  frontend_full:
     build: ./frontend/
-    container_name: frontend_app
-    restart: always
+    container_name: frontend_full_app
+    depends_on:
+      - backend
     profiles:
-      - frontend
       - full
     ports:
       - "3000:3000"
-    volumes:
-      - ./frontend/
+    environment:
+      - NEXT_PUBLIC_BACKEND_API_URL=http://backend:8000
+
+  frontend_only:
+    build: ./frontend/
+    container_name: frontend_only_app
+    profiles:
+      - frontend
+    environment:
+      - NEXT_PUBLIC_BACKEND_API_URL=http://localhost:8000
+    ports:
+      - "3000:3000"
