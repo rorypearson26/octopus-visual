@@ -1,21 +1,14 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo } from 'react';
 
-import {
-  Box,
-  Button,
-  Center,
-  Container,
-  Stack,
-  Text,
-  TextInput,
-} from "@mantine/core";
-import { hasLength, useForm } from "@mantine/form";
+import { Box, Button, Center, Container, Stack, Text, Textarea } from '@mantine/core';
+import { hasLength, useForm } from '@mantine/form';
 
-import { useBackendAwake } from "./api/wakeup/route";
-import Header from "./common/header/Header";
-import StatusWithText from "./common/header/StatusWithText";
+import { useAuthenticate } from './api/authenticate/route';
+import { useBackendAwake } from './api/wakeup/route';
+import Header from './common/header/Header';
+import StatusWithText from './common/header/StatusWithText';
 
 const API_KEY_LENGTH = 10;
 
@@ -35,14 +28,17 @@ export default function LandingPage() {
   });
 
   const { isValid, isDirty } = form;
+  const { isSuccess, token, mutate } = useAuthenticate();
 
   const isContinueEnabled = useMemo(() => {
-    return isDirty() && isValid() && isBackendAwake;
-  }, [isDirty, isValid, isBackendAwake]);
+    return isDirty() && isValid() && isBackendAwake && isSuccess;
+  }, [isDirty, isValid, isBackendAwake, isSuccess]);
 
   const onFormSubmit = () => {
-    console.log("off to see the api");
+    mutate(form.values.apiKey);
   };
+
+  console.log(token);
 
   return (
     <form onSubmit={form.onSubmit(onFormSubmit)}>
@@ -56,22 +52,23 @@ export default function LandingPage() {
             loadingText="Waiting for backend to wake up"
           />
           <StatusWithText
-            isEnabled={false}
+            isEnabled={isSuccess}
             enabledText="API key is good to go"
             loadingText="Submit API key to continue"
           />
           <Stack align="center">
-            <TextInput
+            <Textarea
               {...form.getInputProps("apiKey")}
               mt="md"
               placeholder="API Key"
             />
             <Button type="submit" mt="md">
-              Check API Key
+              Get Kraken Token
             </Button>
             <Center mt={10}>
               <Button disabled={!isContinueEnabled}>Continue</Button>
             </Center>
+            <Text>{token}</Text>
           </Stack>
         </Container>
       </Box>

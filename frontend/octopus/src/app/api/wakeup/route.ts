@@ -1,9 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery } from '@tanstack/react-query';
 
-import api from "../api";
+import customApi from '../api';
 
 async function fetchWakeup() {
-  return api.get("/wakeup");
+  return customApi.get("/wakeup");
 }
 
 export function useBackendAwake() {
