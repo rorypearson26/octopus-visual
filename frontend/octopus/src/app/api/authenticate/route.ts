@@ -1,3 +1,4 @@
+"use client";
 import axios from 'axios';
 
 import { useMutation } from '@tanstack/react-query';
@@ -30,6 +31,7 @@ export interface ObtainKrakenTokenResponse {
 }
 
 function fetchToken(apiKey: string): Promise<ObtainKrakenTokenResponse> {
+  console.log("fetchToken called with API key:", apiKey);
   return octopusApi.post("", {
     headers: {
       "Content-Type": "application/json",
@@ -57,31 +59,24 @@ export function useAuthenticate() {
       return await fetchToken(apiKey);
     },
     retry: false,
+    onError: (error) => {
+      // `error` is the error object
+      console.error("An error occurred:", error);
+      // Show a user-facing error message
+      alert("Failed to create post. Please try again.");
+    },
+    onSuccess: (data) => {
+      const {
+        data: { obtainKrakenToken },
+      } = data.data;
+      console.log("Post created successfully:", data);
+      // Optionally, show a success message or redirect
+      alert(`Post created successfully!: ${obtainKrakenToken.token}`);
+    },
   });
-  console.log(data);
-  console.log(isSuccess);
-  console.log(!isSuccess || !data);
-  if (!isSuccess || !data) {
-    console.log(data);
-    console.log(isSuccess);
-    return {
-      mutate,
-      isSuccess,
-      token: "",
-      refreshToken: "",
-      refreshExpiresIn: 0,
-      possibleErrors: [],
-    };
-  }
-  const {
-    data: { obtainKrakenToken },
-  } = data.data;
+
   return {
     mutate,
     isSuccess,
-    token: obtainKrakenToken.token,
-    refreshToken: obtainKrakenToken.refreshToken,
-    refreshExpiresIn: obtainKrakenToken.refreshExpiresIn,
-    possibleErrors: obtainKrakenToken.possibleErrors,
   };
 }

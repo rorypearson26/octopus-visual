@@ -28,7 +28,7 @@ export default function LandingPage() {
   });
 
   const { isValid, isDirty } = form;
-  const { isSuccess, token, mutate } = useAuthenticate();
+  const { isSuccess, obtainKrakenToken, mutate } = useAuthenticate();
 
   const isContinueEnabled = useMemo(() => {
     return isDirty() && isValid() && isBackendAwake && isSuccess;
@@ -38,7 +38,12 @@ export default function LandingPage() {
     mutate(form.values.apiKey);
   };
 
-  console.log(token);
+  const token = useMemo(() => {
+    if (!obtainKrakenToken) return "";
+    return obtainKrakenToken.token || "";
+  }, [obtainKrakenToken]);
+
+  console.log(obtainKrakenToken);
 
   return (
     <form onSubmit={form.onSubmit(onFormSubmit)}>
@@ -47,7 +52,7 @@ export default function LandingPage() {
         <Container size="sm" mt={20}>
           <Text m={2}>Submit API key to authenticate account</Text>
           <StatusWithText
-            isEnabled={isBackendAwake}
+            isEnabled={true} // change to isBackendAwake
             enabledText="Backend is alive"
             loadingText="Waiting for backend to wake up"
           />
@@ -56,7 +61,7 @@ export default function LandingPage() {
             enabledText="API key is good to go"
             loadingText="Submit API key to continue"
           />
-          <Stack align="center">
+          <Stack align="stretch">
             <Textarea
               {...form.getInputProps("apiKey")}
               mt="md"

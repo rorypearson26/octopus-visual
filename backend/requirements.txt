@@ -1,3 +1,5 @@
 fastapi==0.116.1
 gunicorn
 uvicorn
+
+starlette~=0.47.2

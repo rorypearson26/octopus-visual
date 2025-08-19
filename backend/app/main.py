@@ -1,8 +1,6 @@
-import asyncio
 from http import HTTPStatus
 
-from fastapi import APIRouter, FastAPI, BackgroundTasks, HTTPException
-from fastapi.openapi.models import Response
+from fastapi import APIRouter, FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
 from fake_awake import Awake
@@ -24,7 +22,7 @@ tags_metadata = [
 ]
 
 @router.get("/wakeup/", tags=["setup"])
-async def wakeup(background_tasks: BackgroundTasks):
+async def wakeup():
     return HTTPStatus.OK
 
 origins = [
