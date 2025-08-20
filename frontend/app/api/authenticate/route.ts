@@ -3,6 +3,8 @@ import axios from 'axios';
 
 import { useMutation } from '@tanstack/react-query';
 
+import { handleAuthentication } from '../api';
+
 export const octopusApi = axios.create({
   baseURL: "https://api.octopus.energy/v1/graphql/",
 });
@@ -17,21 +19,21 @@ interface PossibleErrorType {
 export interface ObtainKrakenToken {
   possibleErrors: PossibleErrorType[];
   token: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   payload: any;
   refreshToken: string;
   refreshExpiresIn: number;
 }
 
 export interface ObtainKrakenTokenResponse {
-  data: {
-    data: {
+  data?: {
+    data?: {
       obtainKrakenToken: ObtainKrakenToken;
     };
   };
 }
 
 function fetchToken(apiKey: string): Promise<ObtainKrakenTokenResponse> {
-  console.log("fetchToken called with API key:", apiKey);
   return octopusApi.post("", {
     headers: {
       "Content-Type": "application/json",
@@ -53,25 +55,27 @@ function fetchToken(apiKey: string): Promise<ObtainKrakenTokenResponse> {
 }
 
 export function useAuthenticate() {
-  const { isSuccess, data, mutate } = useMutation({
+  const { isSuccess, mutate } = useMutation({
     mutationKey: ["authenticate"],
     mutationFn: async (apiKey: string) => {
       return await fetchToken(apiKey);
     },
     retry: false,
     onError: (error) => {
-      // `error` is the error object
       console.error("An error occurred:", error);
-      // Show a user-facing error message
       alert("Failed to create post. Please try again.");
     },
     onSuccess: (data) => {
-      const {
-        data: { obtainKrakenToken },
-      } = data.data;
-      console.log("Post created successfully:", data);
-      // Optionally, show a success message or redirect
-      alert(`Post created successfully!: ${obtainKrakenToken.token}`);
+      const tokenData = data.data?.data?.obtainKrakenToken;
+
+      if (tokenData && tokenData.token) {
+        console.log("Post created successfully:", data);
+        alert(`Post created successfully!: ${tokenData.token}`);
+        handleAuthentication(tokenData.token);
+      } else {
+        console.error("Received unexpected data format:", data);
+        alert("Failed to get token. Please try again.");
+      }
     },
   });
 

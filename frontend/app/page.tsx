@@ -2,9 +2,10 @@
 
 import { useMemo } from 'react';
 
-import { Box, Button, Center, Container, Stack, Text, Textarea } from '@mantine/core';
+import { Box, Button, Center, Container, Group, Stack, Text, Textarea } from '@mantine/core';
 import { hasLength, useForm } from '@mantine/form';
 
+import { clearAuthentication, isAuthenticated } from './api/api';
 import { useAuthenticate } from './api/authenticate/route';
 import { useBackendAwake } from './api/wakeup/route';
 import Header from './common/header/Header';
@@ -28,7 +29,7 @@ export default function LandingPage() {
   });
 
   const { isValid, isDirty } = form;
-  const { isSuccess, obtainKrakenToken, mutate } = useAuthenticate();
+  const { isSuccess, mutate } = useAuthenticate();
 
   const isContinueEnabled = useMemo(() => {
     return isDirty() && isValid() && isBackendAwake && isSuccess;
@@ -37,13 +38,6 @@ export default function LandingPage() {
   const onFormSubmit = () => {
     mutate(form.values.apiKey);
   };
-
-  const token = useMemo(() => {
-    if (!obtainKrakenToken) return "";
-    return obtainKrakenToken.token || "";
-  }, [obtainKrakenToken]);
-
-  console.log(obtainKrakenToken);
 
   return (
     <form onSubmit={form.onSubmit(onFormSubmit)}>
@@ -57,7 +51,7 @@ export default function LandingPage() {
             loadingText="Waiting for backend to wake up"
           />
           <StatusWithText
-            isEnabled={isSuccess}
+            isEnabled={isAuthenticated()}
             enabledText="API key is good to go"
             loadingText="Submit API key to continue"
           />
@@ -71,9 +65,17 @@ export default function LandingPage() {
               Get Kraken Token
             </Button>
             <Center mt={10}>
-              <Button disabled={!isContinueEnabled}>Continue</Button>
+              <Group>
+                <Button disabled={!isContinueEnabled}>Continue</Button>
+                <Button
+                  onClick={() => {
+                    clearAuthentication();
+                  }}
+                >
+                  Clear Auth
+                </Button>
+              </Group>
             </Center>
-            <Text>{token}</Text>
           </Stack>
         </Container>
       </Box>
