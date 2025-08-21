@@ -7,15 +7,15 @@ async function fetchWakeup() {
 }
 
 export function useBackendAwake() {
-  const { isSuccess } = useQuery({
+  const { data } = useQuery({
     queryKey: ["wakeup"],
     queryFn: async () => {
-      const res = await fetchWakeup();
-      if (res.status !== 200) return false;
-      return true;
+      return await fetchWakeup()
+        .then(() => true)
+        .catch(() => true);
     },
     retry: false,
   });
 
-  return isSuccess;
+  return data ?? false;
 }

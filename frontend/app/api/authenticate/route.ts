@@ -1,5 +1,6 @@
 "use client";
 import axios from 'axios';
+import { useState } from 'react';
 
 import { useMutation } from '@tanstack/react-query';
 
@@ -54,8 +55,9 @@ function fetchToken(apiKey: string): Promise<ObtainKrakenTokenResponse> {
   });
 }
 
-export function useAuthenticate() {
-  const { isSuccess, mutate } = useMutation({
+export function useAuthenticated() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { mutate } = useMutation({
     mutationKey: ["authenticate"],
     mutationFn: async (apiKey: string) => {
       return await fetchToken(apiKey);
@@ -69,9 +71,8 @@ export function useAuthenticate() {
       const tokenData = data.data?.data?.obtainKrakenToken;
 
       if (tokenData && tokenData.token) {
-        console.log("Post created successfully:", data);
-        alert(`Post created successfully!: ${tokenData.token}`);
         handleAuthentication(tokenData.token);
+        setIsAuthenticated(true);
       } else {
         console.error("Received unexpected data format:", data);
         alert("Failed to get token. Please try again.");
@@ -81,6 +82,7 @@ export function useAuthenticate() {
 
   return {
     mutate,
-    isSuccess,
+    isAuthenticated,
+    setIsAuthenticated,
   };
 }

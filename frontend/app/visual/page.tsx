@@ -1,6 +1,6 @@
 "use client";
 
-import { Container, useMantineColorScheme } from "@mantine/core";
+import { Container, Title, useMantineColorScheme } from '@mantine/core';
 
 export default function Home() {
   const { colorScheme, setColorScheme } = useMantineColorScheme();
@@ -8,5 +8,9 @@ export default function Home() {
     setColorScheme(colorScheme === "dark" ? "light" : "dark");
   };
 
-  return <Container>WHAT MATE</Container>;
+  return (
+    <Container>
+      <Title>Here we are then</Title>
+    </Container>
+  );
 }
