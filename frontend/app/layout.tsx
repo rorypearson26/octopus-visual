@@ -3,6 +3,7 @@
 import '@mantine/core/styles.css';
 
 import { ColorSchemeScript, mantineHtmlProps, MantineProvider } from '@mantine/core';
+import { Notifications } from '@mantine/notifications';
 
 import { octopusTheme } from '../theme';
 import { QueryProvider } from './QueryProvider';
@@ -23,7 +24,10 @@ export default function RootLayout({
       </head>
       <body>
         <QueryProvider>
-          <MantineProvider theme={octopusTheme}>{children}</MantineProvider>
+          <MantineProvider theme={octopusTheme}>
+            <Notifications />
+            {children}
+          </MantineProvider>
         </QueryProvider>
       </body>
     </html>

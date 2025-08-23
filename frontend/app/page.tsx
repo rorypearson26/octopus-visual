@@ -1,15 +1,12 @@
 "use client";
 
 import { useRouter } from 'next/navigation';
-import { useCallback, useMemo } from 'react';
-import { FaOctopusDeploy } from 'react-icons/fa';
+import { useCallback, useEffect, useMemo } from 'react';
 
-import {
-    Alert, Box, Button, Center, Container, Group, Stack, Text, TextInput
-} from '@mantine/core';
+import { Box, Button, Center, Container, Group, Stack, Text, TextInput } from '@mantine/core';
 import { hasLength, useForm } from '@mantine/form';
+import { notifications } from '@mantine/notifications';
 
-import { clearAuthentication } from './api/api';
 import { useAuthenticated } from './api/authenticate/route';
 import { useBackendAwake } from './api/wakeup/route';
 import Header from './common/header/Header';
@@ -19,7 +16,8 @@ const API_KEY_LENGTH = 10;
 
 export default function LandingPage() {
   const isBackendAwake = useBackendAwake();
-  const { mutate, isAuthenticated } = useAuthenticated();
+  const { mutate, isAuthenticated, errors, clearAuthentication } =
+    useAuthenticated();
   const router = useRouter();
 
   const form = useForm({
@@ -34,6 +32,26 @@ export default function LandingPage() {
     },
   });
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      notifications.show({
+        title: "Authentication Successful",
+        message: "You are now authenticated",
+        color: "green",
+      });
+    }
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    if (errors) {
+      notifications.show({
+        title: "Authentication Error",
+        message: errors,
+        color: "red",
+      });
+    }
+  }, [errors]);
+
   const isContinueEnabled = useMemo(() => {
     return isBackendAwake && isAuthenticated;
   }, [isBackendAwake, isAuthenticated]);
@@ -45,9 +63,10 @@ export default function LandingPage() {
   const handleClearAuthentication = useCallback(() => {
     clearAuthentication();
     form.reset();
-  }, [form]);
+  }, [form, clearAuthentication]);
 
   const onFormSubmit = () => {
+    clearAuthentication();
     mutate(form.values.apiKey);
   };
 
@@ -56,16 +75,6 @@ export default function LandingPage() {
       onSubmit={form.onSubmit(onFormSubmit)}
       onReset={handleClearAuthentication}
     >
-      {isAuthenticated && (
-        <Alert
-          variant="light"
-          color="green"
-          title="SUCCESS"
-          icon={<FaOctopusDeploy />}
-        >
-          You are authenticated! Click &quot;Continue&quot; to proceed.
-        </Alert>
-      )}
       <Box>
         <Header />
         <Container size="sm" mt={20}>

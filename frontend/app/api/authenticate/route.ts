@@ -1,10 +1,8 @@
 "use client";
 import axios from 'axios';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { useMutation } from '@tanstack/react-query';
-
-import { handleAuthentication } from '../api';
 
 export const octopusApi = axios.create({
   baseURL: "https://api.octopus.energy/v1/graphql/",
@@ -27,19 +25,23 @@ export interface ObtainKrakenToken {
 }
 
 export interface ObtainKrakenTokenResponse {
-  data?: {
-    data?: {
-      obtainKrakenToken: ObtainKrakenToken;
-    };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  errors?: any;
+  data: {
+    obtainKrakenToken: ObtainKrakenToken | null;
   };
 }
 
-function fetchToken(apiKey: string): Promise<ObtainKrakenTokenResponse> {
-  return octopusApi.post("", {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    query: `
+export function useAuthenticated() {
+  const [errors, setErrors] = useState<string | null>(null);
+
+  function fetchToken(apiKey: string): Promise<ObtainKrakenTokenResponse> {
+    return octopusApi
+      .post("", {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        query: `
       mutation ObtainKrakenToken($input: ObtainJSONWebTokenInput!) {
         obtainKrakenToken(input: $input) {
           token
@@ -49,40 +51,55 @@ function fetchToken(apiKey: string): Promise<ObtainKrakenTokenResponse> {
         }
       }
   `,
-    variables: {
-      input: { APIKey: apiKey },
-    },
-  });
-}
+        variables: {
+          input: { APIKey: apiKey },
+        },
+      })
+      .then((response) => response.data) as Promise<ObtainKrakenTokenResponse>;
+  }
 
-export function useAuthenticated() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  function handleAuthentication(token: string) {
+    if (!token) {
+      clearAuthentication();
+    } else {
+      localStorage.setItem("authToken", token);
+    }
+  }
+
+  function clearAuthentication() {
+    localStorage.removeItem("authToken");
+  }
+  const token = localStorage.getItem("authToken");
+  const isAuthenticated = useMemo(() => {
+    return !!token;
+  }, [token]);
+
   const { mutate } = useMutation({
     mutationKey: ["authenticate"],
     mutationFn: async (apiKey: string) => {
+      setErrors(null);
       return await fetchToken(apiKey);
     },
     retry: false,
     onError: (error) => {
-      console.error("An error occurred:", error);
-      alert("Failed to create post. Please try again.");
+      setErrors(
+        `Failed to authenticate. Issues is likely an Octopus API problem. Error: ${error}`
+      );
+      clearAuthentication();
     },
-    onSuccess: (data) => {
-      const tokenData = data.data?.data?.obtainKrakenToken;
-
-      if (tokenData && tokenData.token) {
-        handleAuthentication(tokenData.token);
-        setIsAuthenticated(true);
+    onSuccess: (responseData: ObtainKrakenTokenResponse) => {
+      if (responseData.errors) {
+        setErrors("Check your API key and try again.");
+        clearAuthentication();
       } else {
-        console.error("Received unexpected data format:", data);
-        alert("Failed to get token. Please try again.");
+        handleAuthentication(responseData.data.obtainKrakenToken!.token);
       }
     },
   });
-
   return {
     mutate,
     isAuthenticated,
-    setIsAuthenticated,
+    errors,
+    clearAuthentication,
   };
 }
