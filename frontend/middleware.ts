@@ -2,7 +2,7 @@ import { jwtDecode } from 'jwt-decode';
 import { NextRequest, NextResponse } from 'next/server';
 
 const protectedRoutes = ["/visual"];
-const publicRoutes = ["/"];
+const publicRoutes = ["/authenticate", "/"];
 
 export default async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
@@ -25,7 +25,7 @@ export default async function middleware(req: NextRequest) {
     decoded?.iss === "https://api.octopus.energy/v1/graphql/";
 
   if (isProtectedRoute && !isOctopusUser) {
-    return NextResponse.redirect(new URL("/", req.nextUrl));
+    return NextResponse.redirect(new URL("/authenticate", req.nextUrl));
   }
 
   if (isPublicRoute && isOctopusUser) {
