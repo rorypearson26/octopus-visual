@@ -1,0 +1,19 @@
+meta {
+  name: meters
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{backendBaseUrl}}/meters/{{accountNumber}}
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: {{bearerToken}}
+}
+
+settings {
+  encodeUrl: true
+}

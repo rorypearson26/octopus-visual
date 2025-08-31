@@ -24,9 +24,14 @@ body:graphql {
 body:graphql:vars {
   {
     "input": {
-      "APIKey": "No"
+      "APIKey": "{{apiKey}}"
     }
   }
+}
+
+script:post-response {
+  let data = res.body;
+  bru.setEnvVar("bearerToken", data.data.obtainKrakenToken.token);
 }
 
 settings {
