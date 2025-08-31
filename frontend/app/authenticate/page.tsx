@@ -1,41 +1,42 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo } from "react";
+import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useMemo } from 'react';
 
-import StatusWithText from "@/_common/header/StatusWithText";
-import {
-  Box,
-  Button,
-  Center,
-  Container,
-  Group,
-  Stack,
-  Text,
-  TextInput,
-} from "@mantine/core";
-import { hasLength, useForm } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
+import StatusWithText from '@/_common/status/StatusWithText';
+import { Box, Button, Center, Container, Group, Stack, Text, TextInput } from '@mantine/core';
+import { hasLength, matches, useForm } from '@mantine/form';
+import { notifications } from '@mantine/notifications';
 
-import useAuthenticated from "./useAthenticate";
-import { useBackendAwake } from "./useBackendAlive";
+import useAuthenticated from './useAthenticate';
+import { useBackendAwake } from './useBackendAlive';
 
-const API_KEY_LENGTH = 10;
+const API_KEY_MIN_LENGTH = 10;
+const API_KEY_MAX_LENGTH = 50;
 
 export default function LandingPage() {
   const isBackendAwake = useBackendAwake();
+
   const { mutate, isAuthenticated, errors, clearAuthentication } =
     useAuthenticated();
+
   const router = useRouter();
 
   const form = useForm({
     validateInputOnChange: true,
-    mode: "uncontrolled",
-    initialValues: { apiKey: "" },
+    onValuesChange: (values) => {
+      form.setFieldValue("accountNumber", values.accountNumber.toUpperCase());
+    },
+    mode: "controlled",
+    initialValues: { apiKey: "", accountNumber: "" },
     validate: {
       apiKey: hasLength(
-        { min: API_KEY_LENGTH },
-        `Must be at least ${API_KEY_LENGTH} characters`
+        { min: API_KEY_MIN_LENGTH, max: API_KEY_MAX_LENGTH },
+        `Must be between ${API_KEY_MIN_LENGTH} and ${API_KEY_MAX_LENGTH} characters`
+      ),
+      accountNumber: matches(
+        /^[A-Z0-9]{8}$/i,
+        "Number should consist of 8 alphanumeric characters"
       ),
     },
   });
@@ -51,12 +52,14 @@ export default function LandingPage() {
   }, [isAuthenticated]);
 
   useEffect(() => {
-    if (errors) {
-      notifications.show({
-        title: "Authentication Error",
-        message: errors,
-        color: "red",
-      });
+    if (errors?.length !== 0 && errors !== null) {
+      for (const error of errors) {
+        notifications.show({
+          title: "Authentication Error",
+          message: error,
+          color: "red",
+        });
+      }
     }
   }, [errors]);
 
@@ -65,7 +68,7 @@ export default function LandingPage() {
   }, [isBackendAwake, isAuthenticated]);
 
   const handleContinue = useCallback(() => {
-    router.push("/visual");
+    router.push("/account");
   }, [router]);
 
   const handleClearAuthentication = useCallback(() => {
@@ -75,7 +78,15 @@ export default function LandingPage() {
 
   const onFormSubmit = () => {
     clearAuthentication();
-    mutate(form.values.apiKey.trim());
+    mutate({
+      apiKey: cleanInput(form.values.apiKey),
+      accountNumber: cleanInput(form.values.accountNumber),
+    });
+  };
+
+  const cleanInput = (formInput: string) => {
+    if (typeof formInput !== "string") return "";
+    return formInput.replace(/\s/g, "").trim();
   };
 
   return (
@@ -99,8 +110,19 @@ export default function LandingPage() {
           <Stack align="stretch">
             <TextInput
               {...form.getInputProps("apiKey")}
+              label="API Key"
               mt="md"
               placeholder="API Key"
+              withAsterisk
+              value={process.env.NEXT_PUBLIC_API_KEY || ""}
+            />
+            <TextInput
+              {...form.getInputProps("accountNumber")}
+              mt="md"
+              label={"Account Number" + process.env.NEXT_PUBLIC_ACCOUNT_NUMBER}
+              leftSection="A-"
+              placeholder="Account Number"
+              withAsterisk
             />
             <Button type="submit" mt="md">
               Get Kraken Token

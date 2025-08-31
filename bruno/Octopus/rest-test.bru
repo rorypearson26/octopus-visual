@@ -1,0 +1,19 @@
+meta {
+  name: rest-test
+  type: http
+  seq: 7
+}
+
+get {
+  url: https://api.octopus.energy/v1/accounts/{{accountNumber}}/
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: {{bearerToken}}
+}
+
+settings {
+  encodeUrl: true
+}

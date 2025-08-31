@@ -1,0 +1,55 @@
+meta {
+  name: Account Info
+  type: graphql
+  seq: 5
+}
+
+post {
+  url: https://api.octopus.energy/v1/graphql/
+  body: graphql
+  auth: none
+}
+
+headers {
+  Authorization: {{bearerToken}}
+}
+
+body:graphql {
+  query MyQuery($accountNumber: String!) {
+    account(accountNumber: $accountNumber) {
+      address {
+        streetAddress
+        postalCode
+        country
+      }
+      balance(includeAllLedgers: true)
+      billingName
+    }
+  }
+}
+
+body:graphql:vars {
+  {
+    "accountNumber": "{{accountNumber}}"
+  }
+}
+
+vars:pre-request {
+  : 
+}
+
+script:post-response {
+  // Parse the response body as JSON
+  const responseData = res.getBody();
+  
+  // Access the nested token
+  const token = res("data.obtainKrakenToken.token");
+  
+  // Save the token as a runtime variable
+  bru.setVar("bearerToken", token);
+  
+}
+
+settings {
+  encodeUrl: true
+}

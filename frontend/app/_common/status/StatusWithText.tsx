@@ -1,8 +1,8 @@
-import { useMemo } from "react";
+import { useMemo } from 'react';
 
-import { Container, Grid, Text } from "@mantine/core";
+import { Container, Grid, Text } from '@mantine/core';
 
-import StatusIcon from "./Status";
+import StatusIcon from './Status';
 
 interface StatusProps {
   isEnabled: boolean;
