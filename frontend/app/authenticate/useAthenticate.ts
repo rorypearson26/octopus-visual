@@ -1,8 +1,8 @@
 "use client";
-import Cookies from 'js-cookie';
-import { useEffect, useState } from 'react';
+import Cookies from "js-cookie";
+import { useEffect, useState } from "react";
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const OCTOPUS_API = "https://api.octopus.energy/v1/graphql/";
 const JWT_EXPIRATION_IN_MINUTES = 30;
@@ -156,7 +156,7 @@ export default function useAuthenticated() {
           sameSite: "strict",
           expires: cookieExpiry,
         });
-        Cookies.set("accountNumber", response.accountNumber, {
+        Cookies.set("accountNumber", `A-${response.accountNumber}`, {
           secure: process.env.NODE_ENV === "production",
           sameSite: "strict",
           expires: cookieExpiry,

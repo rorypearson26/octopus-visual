@@ -1,19 +1,22 @@
-from fastapi import APIRouter, Depends
+from typing import Mapping
 
-from middleware.dependencies import get_token_header
-from external.octopus_api import get_meters_from_octopus
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
+
+from app.external.octopus_api import get_meters_from_octopus
+from app.middleware.dependencies import get_token_header
+
+
+class AccountRequest(BaseModel):
+    account_number: str
+
 
 router = APIRouter(prefix="/api")
 
-class Meters(BaseModel):
-    gas_meter_id: str | None
-    electricity_meter_id: str | None
 
-@router.get("/meters/{account_number}")
+@router.post("/meters")
 async def get_meters(
-    account_number: str,
-    validated_token: str = Depends(get_token_header)
-) -> Meters:
-    get_meters_from_octopus(account_number, validated_token)
-    return Meters(**get_meters_from_octopus(account_number, validated_token))
+        account_details: AccountRequest,
+        validated_token: str = Depends(get_token_header)
+) -> Mapping:
+    return get_meters_from_octopus(account_details.account_number, validated_token).model_dump()

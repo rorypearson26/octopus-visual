@@ -3,7 +3,7 @@ import logging
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-from routers import wakeup, get_meters
+from app.routers import wakeup, get_meters
 
 # Configure the basic logger to output INFO-level messages and higher
 logging.basicConfig(

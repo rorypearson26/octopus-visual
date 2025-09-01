@@ -1,11 +1,14 @@
 "use client";
 
-import { Container, Title } from '@mantine/core';
+import { Container, Title } from "@mantine/core";
+
+import Meters from "./Meters";
 
 export default function Home() {
   return (
     <Container>
-      <Title>Here we are then</Title>
+      <Title>Welcome</Title>
+      <Meters />
     </Container>
   );
 }

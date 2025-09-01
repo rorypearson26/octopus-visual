@@ -4,14 +4,20 @@ meta {
   seq: 1
 }
 
-get {
-  url: {{backendBaseUrl}}/meters/{{accountNumber}}
-  body: none
+post {
+  url: {{backendBaseUrl}}/meters
+  body: json
   auth: inherit
 }
 
 headers {
-  Authorization: {{bearerToken}}
+  token: {{bearerToken}}
+}
+
+body:json {
+  {
+    "accountNumber": {{accountNumber}}
+  }
 }
 
 settings {
