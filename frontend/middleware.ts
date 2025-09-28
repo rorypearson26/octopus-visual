@@ -1,12 +1,16 @@
-import { jwtDecode } from 'jwt-decode';
-import { NextRequest, NextResponse } from 'next/server';
+import { jwtDecode } from "jwt-decode";
+import { NextRequest, NextResponse } from "next/server";
 
-const protectedRoutes = ["/visual"];
+const protectedRoutes = ["/account", "/account/:path*"];
 const publicRoutes = ["/authenticate", "/"];
 
 export default async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
-  const isProtectedRoute = protectedRoutes.includes(path);
+  const isProtectedRoute = protectedRoutes.some((p) => {
+    // This is a simple regex check, you can also use `req.nextUrl.pathname.startsWith('/account')`
+    const pattern = new RegExp(`^${p.replace(/\/\:path\*/, "/.*")}$`);
+    return pattern.test(path);
+  });
   const isPublicRoute = publicRoutes.includes(path);
 
   const token = req.cookies.get("authToken");
@@ -29,7 +33,7 @@ export default async function middleware(req: NextRequest) {
   }
 
   if (isPublicRoute && isOctopusUser) {
-    return NextResponse.redirect(new URL("/visual", req.nextUrl));
+    return NextResponse.redirect(new URL("/account", req.nextUrl));
   }
 
   return NextResponse.next();

@@ -1,29 +1,32 @@
-from http import HTTPStatus
+import logging
 
-from fastapi import APIRouter, FastAPI
+from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-from fake_awake import Awake
+from app.routers import wakeup, meters, account_details
 
-awake = Awake()
+# Configure the basic logger to output INFO-level messages and higher
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
 
 app = FastAPI()
-router = APIRouter(prefix="/api")
 
 tags_metadata = [
     {
-        "name": "setup",
-        "description": "Waking up the backend and getting authenticated with the API key.",
+        "name": "wakeup",
+        "description": "Waking up the backend.",
+    },
+    {
+        "name": "meters",
+        "description": "Returns details of the meters linked to the account number.",
     },
     {
         "name": "data",
         "description": "Fetching data from octopus, doing some processing and returning to client.",
     },
 ]
-
-@router.get("/wakeup/", tags=["setup"])
-async def wakeup():
-    return HTTPStatus.OK
 
 origins = [
     "http://localhost:3000",
@@ -38,4 +41,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(router)
+app.include_router(wakeup.router)
+app.include_router(meters.router)
+app.include_router(account_details.router)

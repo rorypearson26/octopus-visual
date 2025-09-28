@@ -2,10 +2,10 @@
 
 import { Container, Title } from '@mantine/core';
 
-export default function Home() {
+export default function WeatherPage() {
   return (
     <Container>
-      <Title>Here we are then</Title>
+      <Title>Weather</Title>
     </Container>
   );
 }
