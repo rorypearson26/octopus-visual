@@ -13,21 +13,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Add SSH private key to agent
-        uses: webfactory/ssh-agent@v0.5.3
+      # Using appleboy/ssh-action combines key injection and execution
+      - name: Deploy with Appleboy SSH
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # Use the APP_DIR secret value directly within the script
+            APP_DIR="${{ secrets.APP_DIR }}"
 
-      - name: Deploy to Server
-        env:
-          SERVER_USER: ${{ secrets.SERVER_USER }}
-          SERVER_IP: ${{ secrets.SERVER_IP }}
-          APP_DIR: ${{ secrets.APP_DIR }}
-        run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $SERVER_USER@$SERVER_IP "
-          cd $APP_DIR &&
-          git remote set-url origin git@github.com:rorypearson26/octopus-visual.git
-          git pull origin master &&
-          npm install &&
-          npm run build
-          "
+            echo 'Deploying application...'
+
+            cd $APP_DIR || exit 1
+            git remote set-url origin git@github.com:rorypearson26/octopus-visual.git
+            git pull origin master
+
+            # Use Docker Compose for zero-downtime update
+            docker compose pull
+            docker compose up -d --remove-orphans
+
+            echo 'Deployment complete.'
