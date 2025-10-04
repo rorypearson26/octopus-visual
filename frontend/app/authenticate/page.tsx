@@ -1,15 +1,24 @@
 "use client";
 
-import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo } from "react";
 
-import StatusWithText from '@/_common/status/StatusWithText';
-import { Box, Button, Center, Container, Group, Stack, Text, TextInput } from '@mantine/core';
-import { hasLength, matches, useForm } from '@mantine/form';
-import { notifications } from '@mantine/notifications';
+import StatusWithText from "@/_common/status/StatusWithText";
+import {
+  Box,
+  Button,
+  Center,
+  Container,
+  Group,
+  Stack,
+  Text,
+  TextInput,
+} from "@mantine/core";
+import { hasLength, matches, useForm } from "@mantine/form";
+import { notifications } from "@mantine/notifications";
 
-import useAuthenticated from './useAthenticate';
-import { useBackendAwake } from './useBackendAlive';
+import useAuthenticated from "./useAthenticate";
+import { useBackendAwake } from "./useBackendAlive";
 
 const API_KEY_MIN_LENGTH = 10;
 const API_KEY_MAX_LENGTH = 50;
@@ -114,12 +123,11 @@ export default function LandingPage() {
               mt="md"
               placeholder="API Key"
               withAsterisk
-              value={process.env.NEXT_PUBLIC_API_KEY || ""}
             />
             <TextInput
               {...form.getInputProps("accountNumber")}
               mt="md"
-              label={"Account Number" + process.env.NEXT_PUBLIC_ACCOUNT_NUMBER}
+              label="Account Number"
               leftSection="A-"
               placeholder="Account Number"
               withAsterisk
