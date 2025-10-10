@@ -32,7 +32,7 @@ jobs:
             cd $APP_DIR || exit 1
             pwd
             ls
-            git remote set-url origin git@github-deploy.com:rorypearson26/octopus-visual.git
+            git remote set-url origin git@github-deploy:rorypearson26/octopus-visual.git
             git pull origin master
 
             # Use Docker Compose for zero-downtime update
