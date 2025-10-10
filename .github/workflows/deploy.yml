@@ -27,6 +27,8 @@ jobs:
             APP_DIR="${{ secrets.APP_DIR }}"
 
             echo 'Deploying application...'
+            pwd
+            ls
 
             cd $APP_DIR || exit 1
             git remote set-url origin git@github.com:rorypearson26/octopus-visual.git
