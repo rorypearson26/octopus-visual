@@ -21,6 +21,8 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            #!/bin/bash
+            set -e # exit as soon as error raised
             # Use the APP_DIR secret value directly within the script
             APP_DIR="${{ secrets.APP_DIR }}"
 
