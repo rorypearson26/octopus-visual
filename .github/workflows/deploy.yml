@@ -27,7 +27,7 @@ jobs:
             APP_DIR="${{ secrets.APP_DIR }}"
 
             echo 'Deploying application...'
-            
+
 
             cd $APP_DIR || exit 1
             pwd
@@ -36,7 +36,7 @@ jobs:
             git pull origin master
 
             # Use Docker Compose for zero-downtime update
-            docker compose pull
-            docker compose up -d --remove-orphans
+            docker compose build backend frontend_prod --no-cache --pull
+            docker compose --profile full up -d --remove-orphans
 
             echo 'Deployment complete.'
