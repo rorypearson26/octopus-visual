@@ -1,6 +1,8 @@
 import { logger } from '../../pino';
 
 const BACKEND_API = process.env.NEXT_PUBLIC_BACKEND_API_URL;
-logger.info(`Using backend API URL: ${BACKEND_API}`);
-const api = `${BACKEND_API}/api`;
+const isProd = process.env.NODE_ENV === "production";
+const api = isProd ? "/api" : `${BACKEND_API}/api`;
+
+logger.info(`Using backend API URL: ${api}`);
 export default api;
