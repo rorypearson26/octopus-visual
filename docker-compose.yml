@@ -21,8 +21,6 @@ services:
     restart: always
     ports:
       - "3000:3000"
-    environment:
-      - NEXT_PUBLIC_BACKEND_API_URL=https://rorypearson.co.uk/octopus
 
   frontend_only:
     build: ./frontend/
