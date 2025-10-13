@@ -29,6 +29,7 @@ tags_metadata = [
 ]
 
 origins = [
+    "https://www.rorypearson.co.uk"
     "http://localhost:3000",
     "http://0.0.0.0:3000"
 ]

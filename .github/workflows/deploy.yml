@@ -36,7 +36,6 @@ jobs:
             git pull origin master
 
             # Use Docker Compose for zero-downtime update
-            docker compose build backend frontend_prod --no-cache --pull
-            docker compose --profile full up -d --remove-orphans
+            docker compose --profile prod up --build --force-recreate -d
 
             echo 'Deployment complete.'
