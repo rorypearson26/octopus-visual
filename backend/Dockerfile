@@ -10,4 +10,10 @@ RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
 COPY ./app /code/app
 EXPOSE 8000
-CMD ["gunicorn", "app.main:app", "--bind", "0.0.0.0:8000", "--worker-class", "uvicorn.workers.UvicornWorker" ]
+
+CMD ["gunicorn", "--workers", "4", "--worker-connections", "1000", \
+     "--bind", "0.0.0.0:8000", \
+     "--worker-class", "uvicorn.workers.UvicornWorker", \
+     "--env", "PYTHONUNBUFFERED=1", \
+     "--forwarded-allow-ips", "127.0.0.1", \
+     "app.main:app"]
