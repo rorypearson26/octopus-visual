@@ -3,7 +3,7 @@ import logging
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-from app.routers import wakeup, meters, account_details
+from app.routers import healthcheck, meters, account_details
 
 # Configure the basic logger to output INFO-level messages and higher
 logging.basicConfig(
@@ -42,6 +42,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(wakeup.router)
+app.include_router(healthcheck.router)
 app.include_router(meters.router)
 app.include_router(account_details.router)
