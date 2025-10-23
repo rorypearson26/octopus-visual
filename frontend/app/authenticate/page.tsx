@@ -18,13 +18,13 @@ import { hasLength, matches, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 
 import useAuthenticated from "./useAthenticate";
-import { useBackendAwake } from "./useBackendAlive";
+import { useHealthcheck } from "./useHealthcheck";
 
 const API_KEY_MIN_LENGTH = 10;
 const API_KEY_MAX_LENGTH = 50;
 
 export default function LandingPage() {
-  const isBackendAwake = useBackendAwake();
+  const isBackendAwake = useHealthcheck();
 
   const { mutate, isAuthenticated, errors, clearAuthentication } =
     useAuthenticated();
